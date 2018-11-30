@@ -1,5 +1,8 @@
-### WeatherAPI Proyect from go-bootcamp
+## WeatherAPI Proyect from go-bootcamp
 
 Weather proyect using beego framekwork
 
-the measure of time is in -time.info- file
+#### Timing
+
+The measure of time is in __time.info__ file.
+

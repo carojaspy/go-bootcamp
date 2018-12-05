@@ -1,12 +1,13 @@
 package test
 
 import (
+	_ "WeatherAPI/routers"
+	"log"
 	"net/http"
 	"net/http/httptest"
-	"testing"
-	"runtime"
 	"path/filepath"
-	_ "WeatherAPI/routers"
+	"runtime"
+	"testing"
 
 	"github.com/astaxie/beego"
 	. "github.com/smartystreets/goconvey/convey"
@@ -14,7 +15,15 @@ import (
 
 func init() {
 	_, file, _, _ := runtime.Caller(1)
-	apppath, _ := filepath.Abs(filepath.Dir(filepath.Join(file, ".." + string(filepath.Separator))))
+	log.Print(file)
+	// apppath, _ := filepath.Abs(filepath.Dir(filepath.Join(file, ".."+string(filepath.Separator))))
+	apppath := "/mnt/c/Users/carlosalberto.rojas/Desktop/go/src/WeatherAPI/"
+	// apppath := "\\mnt\\c\\Users\\carlosalberto.rojas\\Desktop\\go\\src\\WeatherAPI\\"
+
+	log.Print("apppath: ")
+	log.Print(apppath)
+	log.Print(string(filepath.Separator))
+
 	beego.TestBeegoInit(apppath)
 }
 
@@ -27,12 +36,26 @@ func TestGet(t *testing.T) {
 	beego.Trace("testing", "TestGet", "Code[%d]\n%s", w.Code, w.Body.String())
 
 	Convey("Subject: Test Station Endpoint\n", t, func() {
-	        Convey("Status Code Should Be 200", func() {
-	                So(w.Code, ShouldEqual, 200)
-	        })
-	        Convey("The Result Should Not Be Empty", func() {
-	                So(w.Body.Len(), ShouldBeGreaterThan, 0)
-	        })
+		Convey("Status Code Should Be 200", func() {
+			So(w.Code, ShouldEqual, 200)
+		})
+		Convey("The Result Should Not Be Empty", func() {
+			So(w.Body.Len(), ShouldBeGreaterThan, 0)
+		})
 	})
 }
 
+func TestWeather(t *testing.T) {
+
+	Convey("Given a HTTP request for /weather Without GET params", t, func() {
+		req, _ := http.NewRequest("GET", "/weather", nil)
+		resp := httptest.NewRecorder()
+		beego.BeeApp.Handlers.ServeHTTP(resp, req)
+
+		Convey("When the request is handled by the Router", func() {
+			Convey("Then the response should be a 404", func() {
+				So(resp.Code, ShouldEqual, 404)
+			})
+		})
+	})
+}

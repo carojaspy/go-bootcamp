@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html>
+<head>
+    <meta charset="utf-8" />
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+    <title>Go Shopping</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link rel="stylesheet" type="text/css" media="screen" href="main.css" />
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/3.3.1/jquery.min.js"></script>
+    <script src="main.js"></script>
+</head>
+<body>
+    <div>Your Cart - ID: {{.Cart.ID}} QTY: {{len .Cart.Articles}}</div>
+    <div>
+        <ul>
+            {{range .Articles}}
+                <li class="article {{.ID}}" data-id="{{.ID}}" data-title="{{.Title}}" data-price="{{.Price}}">
+                    {{.ID}} - {{.Title}} - {{.Price}}
+                    <input class="input" id="{{.ID}}" data="" type="number" value="1">
+                    <button class="addToCart" type="button" data-id="{{.ID}}">Add to cart</button>
+                </li>
+            {{end}}
+        </ul>            
+    </div>
+</body>
+
+<script>
+    $(".addToCart").on("click", function(){
+        console.log("addToCart Click");
+        var articleID = $(this).data("id");
+        var lidata = $(".article."+articleID);
+        // Creating payload to update Shopping Cart
+        var data = {ID:articleID,  Title:lidata.data("title"), Price:lidata.data("price")}
+        console.log(data);
+        //  @TODO Send Ajax request to update Shopping Cart
+
+    });
+
+
+</script>
+</html>

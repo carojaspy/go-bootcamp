@@ -1,0 +1,4 @@
+# Library for testing purpose
+go get github.com/smartystreets/goconvey
+# Multiplex for API router
+go get github.com/gorilla/mux

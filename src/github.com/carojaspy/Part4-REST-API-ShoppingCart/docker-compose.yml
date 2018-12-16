@@ -1,0 +1,42 @@
+version: "3"
+
+services:
+  shopping_cart:
+    image: shopping_cart
+    container_name: shopping_cart
+    build:
+      context: .
+      dockerfile: 'Dockerfile'
+    volumes:
+      - ./:/go/src/github.com/carojaspy/Part4-REST-API-ShoppingCart
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=weatherapi
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_PORT=3306
+      - MYSQL_HOST=weather_api_db
+    links:
+      - shopping_db
+    depends_on:
+      - shopping_db
+    ports:
+      - 8000:8000
+    networks:
+      - default
+
+  shopping_db:
+    image: mysql:5.7
+    container_name: shopping_db
+    # volumes:
+    #       - ./mysql/data/dev:/var/lib/mysql
+    #       - ./conf/mysql:/etc/mysql/conf.d
+
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=shopping_cart
+    networks:
+      - default
+    ports:
+      - 3306:3306
+

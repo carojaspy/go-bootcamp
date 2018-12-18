@@ -10,6 +10,7 @@ import (
 	"path"
 
 	"github.com/carojaspy/Part4-REST-API-ShoppingCart/models"
+	_ "github.com/go-sql-driver/mysql"
 	"github.com/gorilla/mux"
 )
 
@@ -27,21 +28,20 @@ var AvailableArticles []models.Article
 //people = append(people, Person{ID: "1", Firstname: "John", Lastname: "Doe", Address: &Address{City: "City X", State: "State X"}})
 //people = append(people, Person{ID: "2", Firstname: "Koko", Lastname: "Doe", Address: &Address{City: "City Z", State: "State Y"}})
 // models.populatePerson(people)
-
-// IndexPage .
-func IndexPage(w http.ResponseWriter, r *http.Request) {
-
+func GetArticlesFromProvider(articles *[]models.Article) error {
 	/*Getting all articles available from */
 	querystring := fmt.Sprintf("http://challenge.getsandbox.com/articles")
 	resp, err := http.Get(querystring)
 	if err != nil {
 		// handle error
 		log.Fatal("Error getting Articles from challenge.getsandbox.com")
-		http.Error(w, err.Error(), http.StatusInternalServerError)
+		//http.Error(w, err.Error(), http.StatusInternalServerError)
+		return err
 	}
 	if resp.StatusCode != 200 {
 		log.Fatal("Code Status invalid: ", resp.StatusCode)
-		http.Error(w, "Error Trying to get Available Articles", http.StatusInternalServerError)
+		return nil
+		//http.Error(w, "Error Trying to get Available Articles", http.StatusInternalServerError)
 	}
 	// Closing conection
 	defer resp.Body.Close()
@@ -52,14 +52,21 @@ func IndexPage(w http.ResponseWriter, r *http.Request) {
 	}
 
 	// Trying to convert the response to struct Article
-	errUn := json.Unmarshal(body, &AvailableArticles)
+	errUn := json.Unmarshal(body, &articles)
 	if errUn != nil {
 		log.Fatal("Error in unmarshall: ", errUn)
 	}
+	return nil
+} //end
 
-	fp := path.Join("src", "github.com", "carojaspy", "templates", "index.html")
+// IndexPage .
+func IndexPage(w http.ResponseWriter, r *http.Request) {
+	err := GetArticlesFromProvider(&AvailableArticles)
+
+	fp := path.Join("src", "github.com", "carojaspy", "Part4-REST-API-ShoppingCart", "templates", "index.html")
 	tmpl, err := template.ParseFiles(fp)
 	if err != nil {
+		log.Println("IndexPage error", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 		return
 	}
@@ -68,8 +75,10 @@ func IndexPage(w http.ResponseWriter, r *http.Request) {
 
 	// Rendering HTML, passing to the HTML the AvailableArticles variable
 	if err := tmpl.Execute(w, data); err != nil {
+		log.Println("IndexPage error", err.Error())
 		http.Error(w, err.Error(), http.StatusInternalServerError)
 	}
+	log.Println("IndexPage 200")
 }
 
 // CreateShopingCart .
@@ -96,8 +105,19 @@ func DeleteShopingCart(w http.ResponseWriter, r *http.Request) {
 
 // AddToShoppingCart .
 func AddToShoppingCart(w http.ResponseWriter, r *http.Request) {
-	// Returning the shopping cart
+	// Add a new Product to the Cart
 	log.Println("AddToShoppingCart")
+	err := GetArticlesFromProvider(&AvailableArticles)
+	if err != nil {
+		log.Println("Error trying to get Items")
+	}
+	log.Println("elements: ", AvailableArticles)
+
+	vars := mux.Vars(r)
+	idItem := vars["id"] // Id of the Item
+	log.Println("Id of URL: ", idItem)
+	// Trying to get Item Element
+
 	json.NewEncoder(w).Encode(cart)
 }
 

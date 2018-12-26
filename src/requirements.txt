@@ -2,3 +2,5 @@
 go get github.com/smartystreets/goconvey
 # Multiplex for API router
 go get github.com/gorilla/mux
+# MySQL Driver
+go get -u github.com/go-sql-driver/mysql

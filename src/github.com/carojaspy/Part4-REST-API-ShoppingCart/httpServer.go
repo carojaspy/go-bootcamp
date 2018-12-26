@@ -7,6 +7,8 @@ import (
 	"strings"
 	"github.com/carojaspy/Part4-REST-API-ShoppingCart/controllers"
 	"github.com/gorilla/mux"
+	"database/sql"
+    _ "github.com/go-sql-driver/mysql"	
 )
 
 func sayhelloName(w http.ResponseWriter, r *http.Request) {
@@ -18,7 +20,21 @@ func sayhelloName(w http.ResponseWriter, r *http.Request) {
 }
 
 func main() {
-	log.Print("Running Server on localhost:8000 ...")
+	log.Print("Running Server on localhost:8000...")
+
+	// Create connection to Database
+	db, err := sql.Open("mysql", "root:123qweasd@tcp(127.0.0.1:3306)/shopping_cart")	
+    // if there is an error opening the connection, handle it
+    if err != nil {
+		log.Println("Error trying to open Mysql Connection")
+        panic(err.Error())
+    }
+    
+    // defer the close till after the main function has finished
+    // executing 
+    defer db.Close()
+    	
+
 	router := mux.NewRouter()
 
 	// Index Router, display HTML page

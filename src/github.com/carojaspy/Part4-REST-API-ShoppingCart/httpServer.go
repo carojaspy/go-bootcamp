@@ -1,10 +1,12 @@
 package main
 
 import (
+	"database/sql"
 	"fmt"
 	"log"
 	"net/http"
 	"strings"
+
 	"github.com/carojaspy/Part4-REST-API-ShoppingCart/controllers"
 	"github.com/gorilla/mux"
 	"database/sql"
@@ -36,6 +38,13 @@ func main() {
     	
 
 	router := mux.NewRouter()
+
+	/* Setup Database */
+	_, err := sql.Open("mysql", "username:password@tcp(127.0.0.1:3306)/test")
+	// if there is an error opening the connection, handle it
+	if err != nil {
+		panic(err.Error())
+	}
 
 	// Index Router, display HTML page
 	router.HandleFunc("/", controllers.IndexPage).Methods("GET")

@@ -1,31 +1,42 @@
-version: "2"
+version: "3"
 
 services:
-  app:
-    image: golang:1.11.2 
+  shopping_cart:
+    image: shopping_cart
+    container_name: shopping_cart
+    build:
+      context: .
+      dockerfile: 'Dockerfile'
     volumes:
-      - .:/go/src/github.com/carojaspy/Part4-REST-API-ShoppingCart
-    working_dir: /go/src/github.com/carojaspy/Part4-REST-API-ShoppingCart
-    command: go run httpServer.go
+      - ./:/go/src/github.com/carojaspy/Part4-REST-API-ShoppingCart
+    environment:
+      - MYSQL_ROOT_PASSWORD=root
+      - MYSQL_DATABASE=weatherapi
+      - MYSQL_USER=root
+      - MYSQL_PASSWORD=root
+      - MYSQL_PORT=3306
+      - MYSQL_HOST=weather_api_db
     links:
-      - db_shoppingcart
+      - shopping_db
     depends_on:
-      - db_shoppingcart
+      - shopping_db
     ports:
-      - 8080:8080
+      - 8000:8000
+    networks:
+      - default
 
-  db_shoppingcart:
+  shopping_db:
     image: mysql:5.7
-    volumes: 
-      - ./mysql/data/dev:/var/lib/mysql
+    container_name: shopping_db
+    # volumes:
+    #       - ./mysql/data/dev:/var/lib/mysql
+    #       - ./conf/mysql:/etc/mysql/conf.d
+
     environment:
       - MYSQL_ROOT_PASSWORD=root
       - MYSQL_DATABASE=shopping_cart
-      - MYSQL_USER=root
-      - MYSQL_PASSWORD=123qweasd
-    networks: 
+    networks:
       - default
-    ports: 
+    ports:
       - 3306:3306
-    
 
